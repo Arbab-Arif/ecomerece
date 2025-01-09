@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -17,7 +18,14 @@ Route::controller(\App\Http\Controllers\CartController::class)->prefix('cart')->
     Route::post('/add', 'add')->name('add');
     Route::get('/cart/remove/{id}', 'remove')->name('remove');
 });
-Route::get('checkout', [\App\Http\Controllers\CheckoutController::class,'checkout'])->name('checkout');
+Route::controller(CheckoutController::class)
+    ->prefix('checkout')
+    ->name('checkout.')
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'create')->name('create');
+        Route::post('charge', 'charge')->name('charge');
+    });
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -37,7 +45,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('/delete/{product}', 'destroy')->name('destroy');
         Route::get('/product/gallery/delete/{productGallery}', 'deleteProductGallery')->name('gallery.delete');
     });
-
 });
+
+Route::view('thanks', 'thanks')->name('thanks');
 
 require __DIR__ . '/auth.php';

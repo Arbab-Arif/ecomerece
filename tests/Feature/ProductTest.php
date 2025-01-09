@@ -176,43 +176,43 @@ class ProductTest extends TestCase
         ]);
     }
 
-//    public function test_authenticated_user_can_delete_product(): void
-//    {
-//        $this->withoutExceptionHandling();
-//        $user = User::factory()->create();
-//        $this->actingAs($user);
-//
-//        Storage::fake('public');
-//
-//        // Create a product with a thumbnail and gallery images
-//        $product = Product::factory()->create([
-//            'thumbnail' => 'thumbnail.jpg',
-//        ]);
-//
-//        $productGallery1 = $product->productGallery()->create(['image' => 'gallery1.jpg']);
-//        $productGallery2 = $product->productGallery()->create(['image' => 'gallery2.jpg']);
-//
-//        // Fake the file existence
-//        Storage::disk('public')->put('thumbnail.jpg', 'dummy content');
-//        Storage::disk('public')->put('gallery1.jpg', 'dummy content');
-//        Storage::disk('public')->put('gallery2.jpg', 'dummy content');
-//
-//        // Send the delete request
-//        $response = $this->delete(route('product.destroy', $product));
-//
-//        $response->assertRedirect(route('product.index'))
-//            ->assertSessionHas('success', 'Product deleted successfully.');
-//
-//        // Assert the product is deleted from the database
-//        $this->assertDatabaseMissing('products', ['id' => $product->id]);
-//
-//        // Assert the gallery items are deleted from the database
-//        $this->assertDatabaseMissing('product_galleries', ['product_id' => $product->id]);
-//
-//        // Assert the files were deleted from storage
-//        Storage::disk('public')->assertMissing('thumbnail.jpg');
-//        Storage::disk('public')->assertMissing('gallery1.jpg');
-//        Storage::disk('public')->assertMissing('gallery2.jpg');
-//    }
+    public function test_authenticated_user_can_delete_product(): void
+    {
+        $this->withoutExceptionHandling();
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        Storage::fake('public');
+
+        // Create a product with a thumbnail and gallery images
+        $product = Product::factory()->create([
+            'thumbnail' => 'thumbnail.jpg',
+        ]);
+
+        $productGallery1 = $product->productGallery()->create(['image' => 'gallery1.jpg']);
+        $productGallery2 = $product->productGallery()->create(['image' => 'gallery2.jpg']);
+
+        // Fake the file existence
+        Storage::disk('public')->put('thumbnail.jpg', 'dummy content');
+        Storage::disk('public')->put('gallery1.jpg', 'dummy content');
+        Storage::disk('public')->put('gallery2.jpg', 'dummy content');
+
+        // Send the delete request
+        $response = $this->delete(route('product.destroy', $product));
+
+        $response->assertRedirect(route('product.index'))
+            ->assertSessionHas('success', 'Product deleted successfully.');
+
+        // Assert the product is deleted from the database
+        $this->assertDatabaseMissing('products', ['id' => $product->id]);
+
+        // Assert the gallery items are deleted from the database
+        $this->assertDatabaseMissing('product_galleries', ['product_id' => $product->id]);
+
+        // Assert the files were deleted from storage
+        Storage::disk('public')->assertMissing('thumbnail.jpg');
+        Storage::disk('public')->assertMissing('gallery1.jpg');
+        Storage::disk('public')->assertMissing('gallery2.jpg');
+    }
 
 }

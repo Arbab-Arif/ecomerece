@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Stripe\PaymentIntent;
-use Stripe\Stripe;
+use App\Models\Customer;
+use Illuminate\Http\Request;
 
 class CheckoutController extends Controller
 {
-    public function checkout()
+    public function index()
     {
         $cart = session('cart');
 
@@ -20,23 +20,57 @@ class CheckoutController extends Controller
             return $item['price'] * $item['qty'];
         });
 
-        // Initialize Stripe
-        Stripe::setApiKey(env('STRIPE_SECRET'));
-
-        // Create a Payment Intent
-        $paymentIntent = PaymentIntent::create([
-            'amount'   => $totalAmount * 100, // Convert to cents
-            'currency' => 'usd',
-            'metadata' => [
-                'user_id' => auth()->id(),
-                'cart_id' => session()->getId(),
-            ],
+        $customer = Customer::firstOrCreate([
+            'name'  => session('customer')['name'],
+            'email' => session('customer')['email'],
         ]);
+
+        $paymentIntent = $customer->createSetupIntent();
 
         return view('checkout', [
             'cart'        => $cart,
             'totalAmount' => $totalAmount,
-            'intent'      => $paymentIntent,
+            'intent'      => $paymentIntent
         ]);
+    }
+
+    public function create(Request $request)
+    {
+        $request->validate([
+            'name'  => 'required',
+            'email' => 'required',
+        ]);
+        session()->put('customer', $request->only('name', 'email'));
+
+        return to_route('checkout.index');
+    }
+
+    public function charge(Request $request)
+    {
+        $request->validate([
+            'paymentMethod' => 'required',
+        ]);
+
+        $totalAmount = collect(session('cart'))->sum(function ($item) {
+            return $item['price'] * $item['qty'];
+        });
+
+        $customer = Customer::firstOrcreate([
+            'name'  => session('customer')['name'],
+            'email' => session('customer')['email'],
+        ]);
+
+        if (!$customer->hasStripeId()) {
+            $customer->createAsStripeCustomer();
+        }
+
+        $customer->updateDefaultPaymentMethod($request->paymentMethod);
+        $orderId = ceil(mt_rand(11111, 99999));
+        $customer->invoiceFor( $orderId . " - Order", $totalAmount * 100);
+
+        session()->forget('cart');
+        session()->forget('customer');
+
+        return to_route('thanks');
     }
 }

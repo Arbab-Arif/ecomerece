@@ -91,14 +91,14 @@ class ProductController extends Controller
         if ($request->hasFile('thumbnail')) {
             $data['thumbnail'] = $this->updateFileAndGetName($request->file('thumbnail'), $product->thumbnail, Product::class);
         }
+        $product->update($data);
         if ($request->hasFile('gallery')) {
             $galleryData = [];
             foreach ($request->file('gallery') as $file) {
                 $galleryData[] = ['image' => $this->saveFileAndGetName($file, ProductGallery::class)];
             }
+            $product->productGallery()->createMany($galleryData);
         }
-        $product->update($data);
-        $product->productGallery()->createMany($galleryData);
 
         return to_route('product.index')->with('success', 'Product Updated successfully.');
 
@@ -106,13 +106,10 @@ class ProductController extends Controller
 
     public function deleteProductGallery(ProductGallery $productGallery)
     {
-        if ($productGallery) {
-            $this->deleteFile($productGallery->image);
-            $productGallery->delete();
+        $this->deleteFile($productGallery->image);
+        $productGallery->delete();
 
-            return back();
-        }
-
+        return back();
     }
 
     public function destroy(Product $product)
@@ -128,7 +125,6 @@ class ProductController extends Controller
         }
         $product->delete();
 
-        return back()->with('success', 'Product deleted successfully.');
-
+        return to_route('product.index')->with('success', 'Product deleted successfully.');
     }
 }

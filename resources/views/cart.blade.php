@@ -84,26 +84,39 @@
                 </div>
             </div>
             @if(session()->has('cart') && count(session()->get('cart')) > 0)
-                <div class="row my-5">
-                    <div class="col-lg-8 col-sm-12"></div>
-                    <div class="col-lg-4 col-sm-12">
-                        <div class="order-box">
-                            <h3>Order Summary</h3>
-                            <div class="d-flex">
-                                <h4>Sub Total</h4>
-                                <div class="ml-auto font-weight-bold">${{ number_format($subTotal, 2) }}</div>
+                <form action="{{ route('checkout.create') }}" method="post">
+                    @csrf
+                    <div class="row my-5">
+                        <div class="col-lg-8 col-sm-12">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="InputName" class="mb-0">Name</label>
+                                    <input type="text" name="name" class="form-control" id="InputName" placeholder="Name"></div>
+                                <div class="form-group col-md-6">
+                                    <label for="InputEmail1" class="mb-0">Email Address</label>
+                                    <input type="email" name="email" class="form-control" id="InputEmail1" placeholder="Enter Email">
+                                </div>
                             </div>
-                            <div class="d-flex gr-total">
-                                <h5>Grand Total</h5>
-                                <div class="ml-auto h5">${{ number_format($subTotal, 2) }}</div>
+                        </div>
+                        <div class="col-lg-4 col-sm-12">
+                            <div class="order-box">
+                                <h3>Order Summary</h3>
+                                <div class="d-flex">
+                                    <h4>Sub Total</h4>
+                                    <div class="ml-auto font-weight-bold">${{ number_format($subTotal, 2) }}</div>
+                                </div>
+                                <div class="d-flex gr-total">
+                                    <h5>Grand Total</h5>
+                                    <div class="ml-auto h5">${{ number_format($subTotal, 2) }}</div>
+                                </div>
+                                <hr>
                             </div>
-                            <hr>
+                        </div>
+                        <div class="col-12 d-flex shopping-box">
+                            <button type="submit" class="ml-auto btn hvr-hover">Checkout</button>
                         </div>
                     </div>
-                    <div class="col-12 d-flex shopping-box">
-                        <a href="{{ route('checkout') }}" class="ml-auto btn hvr-hover">Checkout</a>
-                    </div>
-                </div>
+                </form>
             @endif
         </div>
     </div>

@@ -39,7 +39,6 @@
                     <li class="side-menu">
                         <a href="{{route('cart.index')}}">
                             <i class="fa fa-shopping-bag"></i>
-                            <span class="badge">3</span>
                             <p>My Cart</p>
                         </a>
                     </li>
